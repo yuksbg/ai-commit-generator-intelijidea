@@ -1,0 +1,34 @@
+# Gradle and IntelliJ Platform build outputs
+.gradle/
+.intellijPlatform/
+build/
+out/
+
+# Local IDE settings
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Local codebase index
+.codebase-memory/
+
+# Python build-script caches
+__pycache__/
+*.py[cod]
+.venv/
+
+# Local environment files (keep shareable examples)
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# macOS metadata
+.DS_Store
+._*
+
+# Editor temporary files
+*~
+*.swp
+*.swo
