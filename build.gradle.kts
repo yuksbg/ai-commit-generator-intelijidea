@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.aicommit"
-version = providers.gradleProperty("pluginVersion").getOrElse("0.1.2")
+version = providers.gradleProperty("pluginVersion").getOrElse("0.1.3")
 
 repositories {
     mavenCentral()

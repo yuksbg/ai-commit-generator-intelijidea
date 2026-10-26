@@ -42,7 +42,7 @@ with zipfile.ZipFile(jar, 'w', zipfile.ZIP_DEFLATED) as out:
     for file in resources.rglob('*'):
         if file.is_file():
             out.write(file, file.relative_to(resources))
-archive = root / 'build/distributions/ai-commit-message-0.1.2.zip'
+archive = root / 'build/distributions/ai-commit-message-0.1.3.zip'
 archive.parent.mkdir(parents=True, exist_ok=True)
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as out:
     out.write(jar, 'ai-commit-message/lib/ai-commit-message.jar')

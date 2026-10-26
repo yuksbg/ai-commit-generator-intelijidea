@@ -36,7 +36,13 @@ jobs:
         id: version
         shell: bash
         run: |
-          version="0.1.2-ci.${GITHUB_RUN_NUMBER}"
+          base_version="$(python3 -c 'import xml.etree.ElementTree as ET; print(ET.parse("src/main/resources/META-INF/plugin.xml").getroot().findtext("version"))')"
+          if [[ ! "$base_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a numeric major.minor.patch base version, got: $base_version" >&2
+            exit 1
+          fi
+          IFS=. read -r major minor patch <<< "$base_version"
+          version="${major}.${minor}.$((10#$patch + GITHUB_RUN_NUMBER))"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           printf 'Plugin version: `%s`\n\nCommit: `%s`\n' "$version" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
 
@@ -72,8 +78,7 @@ jobs:
             gh release create "$tag" "$archive" \
               --target "$GITHUB_SHA" \
               --title "AI Commit Message generator by 0config.eu ${PLUGIN_VERSION}" \
-              --notes-file "$notes" \
-              --prerelease
+              --notes-file "$notes"
           fi
           release_url="$(gh release view "$tag" --json url --jq .url)"
           printf '\n[Download plugin release](%s)\n' "$release_url" >> "$GITHUB_STEP_SUMMARY"
