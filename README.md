@@ -68,7 +68,7 @@ gradle check buildPlugin -PlocalIdePath=/Applications/GoLand.app
 gradle runIde -PlocalIdePath=/Applications/GoLand.app
 ```
 
-Without `localIdePath`, Gradle downloads GoLand 2026.2.3. The Gradle build requires access to plugin and dependency repositories. The local Python build is the verified build path for this initial version; the Gradle path has not yet been executed.
+Without `localIdePath`, Gradle downloads GoLand 2026.2.3. The Gradle build requires access to plugin and dependency repositories. Both the local Python build and Gradle 9.1.0 `check buildPlugin` have been verified against the installed GoLand 2026.2.3 SDK with JDK 25. Gradle runs the 31 assertion-based checks through `coreTest`; the standard `test` task allows an empty JUnit suite because these checks use a standalone main program.
 
 ## Validation
 

@@ -16,6 +16,12 @@ dependencies {
         val localIde = providers.gradleProperty("localIdePath")
         if (localIde.isPresent) local(localIde.get()) else goland("2026.2.3")
         bundledPlugin("Git4Idea")
+        // Commit patch helpers and Git repository base classes live in separate platform modules.
+        bundledModules(
+            "intellij.platform.vcs.impl",
+            "intellij.platform.vcs.dvcs",
+            "intellij.platform.vcs.dvcs.impl",
+        )
     }
 }
 
@@ -28,8 +34,11 @@ intellijPlatform {
 }
 tasks.register<JavaExec>("coreTest") {
     dependsOn(tasks.testClasses)
-    classpath = sourceSets.test.get().runtimeClasspath
+    // The standalone runner needs IDE-provided libraries (such as Gson) at runtime.
+    classpath = sourceSets.test.get().runtimeClasspath + sourceSets.main.get().compileClasspath
     mainClass = "dev.aicommit.CoreTest"
     enableAssertions = true
 }
 tasks.check { dependsOn("coreTest") }
+// CoreTest is an assertion-based main program, not a JUnit test suite.
+tasks.test { failOnNoDiscoveredTests = false }
