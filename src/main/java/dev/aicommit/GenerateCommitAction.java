@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.changes.Change;
@@ -58,6 +59,8 @@ public final class GenerateCommitAction extends DumbAwareAction {
         String model = settings.model;
         String template = settings.prompt;
         int maxChars = settings.maxDiffChars;
+        var generationLifetime = Disposer.newCheckedDisposable();
+        Disposer.register(ui, generationLifetime);
         project.putUserData(RUNNING, true);
         new Task.Backgroundable(project, "Generate commit message with OpenAI", true) {
             private String result;
@@ -78,11 +81,14 @@ public final class GenerateCommitAction extends DumbAwareAction {
                     if (diff.isBlank()) throw new java.io.IOException("The selected changes contain no text diff.");
                     if (diff.length() > maxChars) throw new java.io.IOException("Selected diff has " + diff.length()
                         + " characters, exceeding the limit of " + maxChars + ". Select fewer changes or raise the limit in settings.");
-                    String branches = ReadAction.compute(() -> selected.stream().map(change -> {
+                    String branches = ReadAction.nonBlocking(() -> selected.stream().map(change -> {
                         var revision = change.getAfterRevision() != null ? change.getAfterRevision() : change.getBeforeRevision();
                         var repository = GitRepositoryManager.getInstance(project).getRepositoryForFileQuick(revision.getFile());
                         return repository == null ? "" : repository.getCurrentBranchName();
-                    }).filter(name -> name != null && !name.isBlank()).distinct().sorted().collect(Collectors.joining(", ")));
+                    }).filter(name -> name != null && !name.isBlank()).distinct().sorted().collect(Collectors.joining(", ")))
+                        .expireWith(project)
+                        .expireWith(generationLifetime)
+                        .executeSynchronously();
                     indicator.setText("Waiting for " + model);
                     result = new OpenAiClient().generate(key, model,
                         PromptTemplate.render(template, branches, LocalDate.now()), diff, indicator::checkCanceled);
@@ -91,7 +97,7 @@ public final class GenerateCommitAction extends DumbAwareAction {
                 catch (Exception error) { failure = error.getMessage() == null ? "Could not generate the message." : error.getMessage(); }
             }
             @Override public void onSuccess() {
-                if (project.isDisposed() || com.intellij.openapi.util.Disposer.isDisposed(ui)) return;
+                if (project.isDisposed() || generationLifetime.isDisposed()) return;
                 if (missingKey) {
                     ShowSettingsUtil.getInstance().showSettingsDialog(project, CommitConfigurable.class); return;
                 }
@@ -104,7 +110,10 @@ public final class GenerateCommitAction extends DumbAwareAction {
                 }
                 editor.setText(result); editor.focus();
             }
-            @Override public void onFinished() { project.putUserData(RUNNING, null); }
+            @Override public void onFinished() {
+                Disposer.dispose(generationLifetime);
+                project.putUserData(RUNNING, null);
+            }
         }.queue();
     }
 }
