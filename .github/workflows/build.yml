@@ -12,6 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - name: Check out sources
         uses: actions/checkout@v6
@@ -50,6 +52,31 @@ jobs:
           path: build/distributions/*.zip
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish GitHub release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PLUGIN_VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          tag="v${PLUGIN_VERSION}"
+          archive="build/distributions/ai-commit-message-${PLUGIN_VERSION}.zip"
+          test -f "$archive"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" "$archive" --clobber
+          else
+            notes="$RUNNER_TEMP/release-notes.md"
+            printf 'Automated build from commit `%s`.\n\nDownload the `ai-commit-message-*.zip` asset and install it via **Settings → Plugins → gear menu → Install Plugin from Disk**.\n\nRequires IntelliJ IDEA or GoLand 2026.2 (build 262).\n' "$GITHUB_SHA" > "$notes"
+            gh release create "$tag" "$archive" \
+              --target "$GITHUB_SHA" \
+              --title "AI Commit Message ${PLUGIN_VERSION}" \
+              --notes-file "$notes" \
+              --prerelease
+          fi
+          release_url="$(gh release view "$tag" --json url --jq .url)"
+          printf '\n[Download plugin release](%s)\n' "$release_url" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload test and build reports
         if: always()
