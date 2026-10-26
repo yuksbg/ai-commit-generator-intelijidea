@@ -70,7 +70,7 @@ jobs:
             printf 'Automated build from commit `%s`.\n\nDownload the `ai-commit-message-*.zip` asset and install it via **Settings → Plugins → gear menu → Install Plugin from Disk**.\n\nRequires IntelliJ IDEA or GoLand 2026.2 (build 262).\n' "$GITHUB_SHA" > "$notes"
             gh release create "$tag" "$archive" \
               --target "$GITHUB_SHA" \
-              --title "AI Commit Message generator by 0config.eu ${PLUGIN_VERSION}" \
+              --title "$PLUGIN_VERSION" \
               --notes-file "$notes"
           fi
           release_url="$(gh release view "$tag" --json url --jq .url)"
