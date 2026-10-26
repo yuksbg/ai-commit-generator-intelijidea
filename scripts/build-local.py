@@ -5,12 +5,15 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import zipfile
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--ide', default='/Applications/GoLand.app/Contents')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
+version = subprocess.check_output(
+    [sys.executable, str(root / 'scripts/version.py')], text=True).strip()
 ide = Path(args.ide).resolve()
 if (ide / 'Contents').is_dir():
     ide = ide / 'Contents'
@@ -41,8 +44,12 @@ with zipfile.ZipFile(jar, 'w', zipfile.ZIP_DEFLATED) as out:
     resources = root / 'src/main/resources'
     for file in resources.rglob('*'):
         if file.is_file():
-            out.write(file, file.relative_to(resources))
-archive = root / 'build/distributions/ai-commit-message-0.1.3.zip'
+            if file.relative_to(resources).as_posix() == 'META-INF/plugin.xml':
+                descriptor = file.read_text().replace('<idea-plugin>', f'<idea-plugin>\n  <version>{version}</version>', 1)
+                out.writestr('META-INF/plugin.xml', descriptor)
+            else:
+                out.write(file, file.relative_to(resources))
+archive = root / f'build/distributions/ai-commit-message-{version}.zip'
 archive.parent.mkdir(parents=True, exist_ok=True)
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as out:
     out.write(jar, 'ai-commit-message/lib/ai-commit-message.jar')

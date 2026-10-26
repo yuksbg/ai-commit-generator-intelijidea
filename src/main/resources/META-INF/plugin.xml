@@ -1,7 +1,6 @@
 <idea-plugin>
   <id>dev.aicommit.message</id>
   <name>AI Commit Message generator by 0config.eu</name>
-  <version>0.1.3</version>
   <vendor>0config.eu</vendor>
   <description><![CDATA[Generate editable Git commit messages with OpenAI. Choose your model and customize your prompt in Settings | Tools | AI Commit Message generator by 0config.eu. Selected diffs are sent to OpenAI only when you invoke generation.]]></description>
   <idea-version since-build="262" until-build="262.*"/>

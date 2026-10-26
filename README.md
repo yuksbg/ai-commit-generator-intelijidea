@@ -4,7 +4,7 @@ A native IntelliJ Platform plugin for drafting Git commit messages with OpenAI. 
 
 ## Install and use
 
-1. Build the plugin using the command below, or use `build/distributions/ai-commit-message-0.1.3.zip` if already built.
+1. Build the plugin using the command below, or use `build/distributions/ai-commit-message-<version>.zip` if already built.
 2. In your IDE, open **Settings → Plugins → gear menu → Install Plugin from Disk…**, select the ZIP, and restart if prompted.
 3. Open **Settings → Tools → AI Commit Message generator by 0config.eu**. Enter an OpenAI API key, choose a model, and click Apply.
 4. In the Commit tool window, check the changes to include and click the lightning action **Generate Commit Message with OpenAI** beside the message editor. You can also find this action using Find Action while the Commit window has focus.
@@ -47,7 +47,7 @@ Requires Python 3 and an installed GoLand 2026.2 IDE with JDK 25 (its bundled ru
 python3 scripts/build-local.py --ide /Applications/GoLand.app
 ```
 
-The script compiles against the installed SDK, runs core tests with a loopback HTTP server, and produces `build/distributions/ai-commit-message-0.1.3.zip`. It makes no OpenAI calls. On other installations, set `JAVA_HOME` to JDK 25 if the IDE has no compiler.
+The script compiles against the installed SDK, runs core tests with a loopback HTTP server, and produces `build/distributions/ai-commit-message-<version>.zip`. It makes no OpenAI calls. On other installations, set `JAVA_HOME` to JDK 25 if the IDE has no compiler.
 
 ## Gradle development
 
@@ -55,9 +55,11 @@ The script compiles against the installed SDK, runs core tests with a loopback H
 
 Every push to `main` runs `.github/workflows/build.yml`. You can also start it manually from the repository's **Actions** tab. It installs JDK 25 and Gradle 9.1.0, downloads the GoLand SDK, runs `check` (including `coreTest`), and packages the plugin with `buildPlugin`.
 
-Each workflow run reads the base version from `plugin.xml` and adds the GitHub workflow run number to its patch component. With base `0.1.3`, run 42 produces `0.1.45`, and run 43 produces `0.1.46`. This keeps automated builds above the base version already uploaded manually; no version-bump commit is needed for each push. Re-running the same run keeps its version. Gradle embeds that version in the plugin descriptor and ZIP filename. Download the ZIP from the successful run's **Artifacts** section; artifacts are retained for 30 days. The run summary records the version and source commit. Successful runs on `main` also create a Git tag and a GitHub release with the installable ZIP attached under [Releases](https://github.com/yuksbg/ai-commit-generator-intelijidea/releases). Re-running a workflow updates the existing release asset. Manual runs from other branches only upload workflow artifacts. Publishing uses the built-in `GITHUB_TOKEN` with `contents: write`; no personal access token is needed. GitHub Packages and JetBrains Marketplace publishing are not configured.
+Versions are generated automatically by `scripts/version.py` as `1.0.<Git commit count>`. For example, commit count 7 produces `1.0.7`; the next commit produces `1.0.8`. No version fields need to be edited. The workflow checks out full Git history, and Gradle and the local Python build use the same generator, so rebuilding the same commit keeps its version. Uncommitted edits do not allocate a new version. Use normal forward commits on `main` to keep versions increasing; shallow checkouts are rejected.
 
-To reproduce a CI version locally, run `gradle check buildPlugin -PpluginVersion=0.1.45`. Builds without this property retain version `0.1.3`. When changing the base version, update the default in `build.gradle.kts` and the local Python build and plugin descriptor versions together. Local builds do not allocate a new release version. For Marketplace uploads, use the versioned ZIP attached to the GitHub Release. Re-running an existing workflow keeps its version and cannot create a new Marketplace update; push a new commit or dispatch a new workflow run for that.
+Every successful run on `main` creates a version tag and a GitHub Release with the installable ZIP attached under [Releases](https://github.com/yuksbg/ai-commit-generator-intelijidea/releases). Use that ZIP for Marketplace uploads. Re-running a build updates the existing release asset; a new Marketplace update requires a new commit. Manual runs on other branches only upload workflow artifacts. Publishing uses the built-in `GITHUB_TOKEN` with `contents: write`; no personal access token is needed. GitHub Packages and automatic JetBrains Marketplace publishing are not configured.
+
+The run summary records the version, source commit, and release link. Workflow artifacts are retained for 30 days. Run `python3 scripts/version.py` to inspect the version locally; both build paths embed it in the plugin descriptor and ZIP filename.
 
 ### Local Gradle commands
 

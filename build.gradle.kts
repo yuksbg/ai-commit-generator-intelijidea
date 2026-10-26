@@ -4,7 +4,9 @@ plugins {
 }
 
 group = "dev.aicommit"
-version = providers.gradleProperty("pluginVersion").getOrElse("0.1.3")
+version = providers.exec {
+    commandLine("python3", "scripts/version.py")
+}.standardOutput.asText.get().trim()
 
 repositories {
     mavenCentral()
