@@ -117,7 +117,7 @@ final class OpenAiClient {
 
     static String errorForStatus(int status) {
         return switch (status) {
-            case 401 -> "OpenAI rejected the API key. Update it in Settings | Tools | AI Commit Message.";
+            case 401 -> "OpenAI rejected the API key. Update it in Settings | Tools | AI Commit Message generator by 0config.eu.";
             case 403 -> "This API key does not have access to the selected model.";
             case 429 -> "OpenAI rate or quota limit reached. Check API billing or try again later.";
             case 400, 404 -> "OpenAI rejected the request. Check that your model supports the Responses API.";

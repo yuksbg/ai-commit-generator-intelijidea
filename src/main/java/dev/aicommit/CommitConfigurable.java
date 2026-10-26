@@ -24,7 +24,7 @@ public final class CommitConfigurable implements Configurable {
     private JButton refresh;
     private long generation;
 
-    @Override public String getDisplayName() { return "AI Commit Message"; }
+    @Override public String getDisplayName() { return "AI Commit Message generator by 0config.eu"; }
     @Override public JComponent createComponent() {
         apiKey = new JBPasswordField();
         removeKey = new JCheckBox("Remove saved API key");

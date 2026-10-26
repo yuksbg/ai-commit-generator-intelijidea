@@ -1,16 +1,16 @@
 <idea-plugin>
   <id>dev.aicommit.message</id>
-  <name>AI Commit Message</name>
+  <name>AI Commit Message generator by 0config.eu</name>
   <version>0.1.2</version>
-  <vendor>AI Commit Message</vendor>
-  <description><![CDATA[Generate editable Git commit messages with OpenAI. Choose your model and customize your prompt in Settings | Tools | AI Commit Message. Selected diffs are sent to OpenAI only when you invoke generation.]]></description>
+  <vendor>0config.eu</vendor>
+  <description><![CDATA[Generate editable Git commit messages with OpenAI. Choose your model and customize your prompt in Settings | Tools | AI Commit Message generator by 0config.eu. Selected diffs are sent to OpenAI only when you invoke generation.]]></description>
   <idea-version since-build="262" until-build="262.*"/>
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.vcs</depends>
   <depends>Git4Idea</depends>
   <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="dev.aicommit.CommitSettings"/>
-    <applicationConfigurable parentId="tools" id="dev.aicommit.settings" displayName="AI Commit Message" instance="dev.aicommit.CommitConfigurable"/>
+    <applicationConfigurable parentId="tools" id="dev.aicommit.settings" displayName="AI Commit Message generator by 0config.eu" instance="dev.aicommit.CommitConfigurable"/>
   </extensions>
   <actions>
     <action id="AICommit.Generate" class="dev.aicommit.GenerateCommitAction" text="Generate Commit Message with OpenAI" description="Generate a draft from included changes" icon="AllIcons.Actions.Lightning">

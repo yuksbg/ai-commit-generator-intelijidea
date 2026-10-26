@@ -39,13 +39,13 @@ public final class GenerateCommitAction extends DumbAwareAction {
         var settings = CommitSettings.getInstance().getState();
         List<FilePath> unversioned = List.copyOf(ui.getIncludedUnversionedFiles());
         if (!unversioned.isEmpty() && !settings.includeUnversionedFiles) {
-            Messages.showInfoMessage(project, "Enable Include selected unversioned files in Settings | Tools | AI Commit Message, or add these files to Git first.", "AI Commit Message");
+            Messages.showInfoMessage(project, "Enable Include selected unversioned files in Settings | Tools | AI Commit Message generator by 0config.eu, or add these files to Git first.", "AI Commit Message generator by 0config.eu");
             return;
         }
         FileDocumentManager.getInstance().saveAllDocuments();
         List<Change> changes = List.copyOf(ui.getIncludedChanges());
         if (changes.isEmpty() && unversioned.isEmpty()) {
-            Messages.showInfoMessage(project, "Select the changes to include in your commit first.", "AI Commit Message"); return;
+            Messages.showInfoMessage(project, "Select the changes to include in your commit first.", "AI Commit Message generator by 0config.eu"); return;
         }
         // Wrap on the UI thread so excluded hunks do not leak into the generated patch.
         List<Change> selected = new ArrayList<>(PartialChangesUtil.wrapPartialChanges(project, changes));
@@ -95,11 +95,11 @@ public final class GenerateCommitAction extends DumbAwareAction {
                 if (missingKey) {
                     ShowSettingsUtil.getInstance().showSettingsDialog(project, CommitConfigurable.class); return;
                 }
-                if (failure != null) { Messages.showErrorDialog(project, failure, "AI Commit Message"); return; }
+                if (failure != null) { Messages.showErrorDialog(project, failure, "AI Commit Message generator by 0config.eu"); return; }
                 if (result == null) return;
                 if (!editor.getText().equals(original) || !ui.getIncludedChanges().equals(changes)
                     || !ui.getIncludedUnversionedFiles().equals(unversioned)) {
-                    Messages.showInfoMessage(project, "The message or selection changed during generation. Your current draft was preserved.\n\nGenerated draft:\n" + result, "AI Commit Message");
+                    Messages.showInfoMessage(project, "The message or selection changed during generation. Your current draft was preserved.\n\nGenerated draft:\n" + result, "AI Commit Message generator by 0config.eu");
                     return;
                 }
                 editor.setText(result); editor.focus();

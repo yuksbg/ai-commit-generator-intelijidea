@@ -1,4 +1,4 @@
-# AI Commit Message
+# AI Commit Message generator by 0config.eu
 
 A native IntelliJ Platform plugin for drafting Git commit messages with OpenAI. Built against GoLand 2026.2.3; the current package targets IntelliJ IDEA and GoLand 2026.2 (build 262).
 
@@ -6,7 +6,7 @@ A native IntelliJ Platform plugin for drafting Git commit messages with OpenAI. 
 
 1. Build the plugin using the command below, or use `build/distributions/ai-commit-message-0.1.2.zip` if already built.
 2. In your IDE, open **Settings → Plugins → gear menu → Install Plugin from Disk…**, select the ZIP, and restart if prompted.
-3. Open **Settings → Tools → AI Commit Message**. Enter an OpenAI API key, choose a model, and click Apply.
+3. Open **Settings → Tools → AI Commit Message generator by 0config.eu**. Enter an OpenAI API key, choose a model, and click Apply.
 4. In the Commit tool window, check the changes to include and click the lightning action **Generate Commit Message with OpenAI** beside the message editor. You can also find this action using Find Action while the Commit window has focus.
 5. Review and edit the generated message, then commit normally.
 
